@@ -29,7 +29,7 @@ func SelectProxy(rail miso.Rail, host string, proxyGroup string, name string) (s
 
 func GetProxyDelay(rail miso.Rail, host string, name string) (string, error) {
 	return miso.NewDefaultTClient(rail, host+"/proxies/"+name+"/delay").
-		AddQueryParams("timeout", "2000").
+		AddQueryParams("timeout", "1000").
 		AddQueryParams("url", "https://www.google.com/").
 		Get().
 		Str()

@@ -2,6 +2,8 @@ package main
 
 import (
 	"flag"
+	"fmt"
+	"sync"
 
 	"github.com/curtisnewbie/clash-cli/clashcli"
 	"github.com/curtisnewbie/miso/miso"
@@ -13,12 +15,21 @@ const (
 	CmdGetProxiesNamed = "GetProxiesNamed"
 	CmdSelectProxy     = "SelectProxy"
 	CmdGetProxyDelay   = "GetProxyDelay"
-	CmdGetLogs         = "GetLogs"
+)
+
+var (
+	Commands = []string{
+		CmdGetConfigs,
+		CmdGetProxies,
+		CmdGetProxiesNamed,
+		CmdSelectProxy,
+		CmdGetProxyDelay,
+	}
 )
 
 func main() {
-	Host := flag.String("host", "http://localhost:9090", "clash host address")
-	Command := flag.String("command", CmdGetProxies, "clash command")
+	Host := flag.String("host", "http://curtisnewbie.com:9090", "clash host address")
+	Command := flag.String("command", "", fmt.Sprintf("clash command: %v", Commands))
 	ProxyGroup := flag.String("proxy-group", "Proxy", "proxy group")
 	Proxy := flag.String("proxy-name", "", "proxy name")
 	flag.Parse()
@@ -56,10 +67,42 @@ func main() {
 		}
 		rail.Infof("Selected proxy %v: %v", *Proxy, r)
 	case CmdGetProxyDelay:
-		r, err := clashcli.GetProxyDelay(rail, *Host, *Proxy)
-		if err != nil {
-			panic(err)
-		}
-		rail.Infof("Proxy delay %v: %v", *Proxy, r)
+		GetDelayAll(rail, *Host, *ProxyGroup)
 	}
+}
+
+type ProxiesNamed struct {
+	All  []string
+	Name string
+	Now  string
+}
+
+func GetDelayAll(rail miso.Rail, host string, name string) {
+	r, err := clashcli.GetProxiesNamed(rail, host, name)
+	if err != nil {
+		panic(err)
+	}
+	rail.Infof("Proxies: %v", r)
+
+	var proxies ProxiesNamed
+	if err := miso.ParseJson([]byte(r), &proxies); err != nil {
+		panic(err)
+	}
+	rail.Infof("ProxiedNamed: %+v", proxies)
+
+	var wg sync.WaitGroup
+
+	for i := range proxies.All {
+		wg.Add(1)
+		go func(p string) {
+			defer wg.Done()
+			delay, err := clashcli.GetProxyDelay(rail, host, p)
+			if err != nil {
+				rail.Errorf("Check proxy delay failed, %v, %v", p, err)
+				return
+			}
+			rail.Infof("%v delay %v", p, delay)
+		}(proxies.All[i])
+	}
+	wg.Wait()
 }
