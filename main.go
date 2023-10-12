@@ -28,7 +28,7 @@ var (
 )
 
 func main() {
-	Host := flag.String("host", "http://curtisnewbie.com:9090", "clash host address")
+	Host := flag.String("host", "http://localhost:9090", "clash host address")
 	Command := flag.String("command", "", fmt.Sprintf("clash command: %v", Commands))
 	ProxyGroup := flag.String("proxy-group", "Proxy", "proxy group")
 	Proxy := flag.String("proxy-name", "", "proxy name")
