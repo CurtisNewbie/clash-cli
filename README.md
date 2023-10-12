@@ -6,6 +6,8 @@ doc: https://dreamacro.github.io/clash/runtime/external-controller.html
 
 
 ```sh
+go run main.go -h
+
 go run main.go -host http://localhost:9090 -command GetConfigs
 go run main.go -host http://localhost:9090 -command GetProxies
 go run main.go -host http://localhost:9090 -command GetProxiesNamed -proxy-name Proxy
