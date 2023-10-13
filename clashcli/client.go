@@ -21,7 +21,8 @@ func GetProxiesNamed(rail miso.Rail, host string, name string) (string, error) {
 }
 
 func SelectProxy(rail miso.Rail, host string, proxyGroup string, name string) (string, error) {
-	dat := struct{ Name string }{Name: name}
+	type SelectProxyPayload struct{ Name string }
+	dat := SelectProxyPayload{Name: name}
 	return miso.NewDefaultTClient(rail, host+"/proxies/"+proxyGroup).
 		PutJson(dat).
 		Str()
