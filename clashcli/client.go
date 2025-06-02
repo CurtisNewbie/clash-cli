@@ -3,19 +3,19 @@ package clashcli
 import "github.com/curtisnewbie/miso/miso"
 
 func GetConfigs(rail miso.Rail, host string) (string, error) {
-	return miso.NewDefaultTClient(rail, host+"/configs").
+	return miso.NewTClient(rail, host+"/configs").
 		Get().
 		Str()
 }
 
 func GetProxies(rail miso.Rail, host string) (string, error) {
-	return miso.NewDefaultTClient(rail, host+"/proxies").
+	return miso.NewTClient(rail, host+"/proxies").
 		Get().
 		Str()
 }
 
 func GetProxiesNamed(rail miso.Rail, host string, name string) (string, error) {
-	return miso.NewDefaultTClient(rail, host+"/proxies/"+name).
+	return miso.NewTClient(rail, host+"/proxies/"+name).
 		Get().
 		Str()
 }
@@ -23,13 +23,13 @@ func GetProxiesNamed(rail miso.Rail, host string, name string) (string, error) {
 func SelectProxy(rail miso.Rail, host string, proxyGroup string, name string) (string, error) {
 	type SelectProxyPayload struct{ Name string }
 	dat := SelectProxyPayload{Name: name}
-	return miso.NewDefaultTClient(rail, host+"/proxies/"+proxyGroup).
+	return miso.NewTClient(rail, host+"/proxies/"+proxyGroup).
 		PutJson(dat).
 		Str()
 }
 
 func GetProxyDelay(rail miso.Rail, host string, name string) (string, error) {
-	return miso.NewDefaultTClient(rail, host+"/proxies/"+name+"/delay").
+	return miso.NewTClient(rail, host+"/proxies/"+name+"/delay").
 		AddQueryParams("timeout", "1000").
 		AddQueryParams("url", "https://www.google.com/").
 		Get().

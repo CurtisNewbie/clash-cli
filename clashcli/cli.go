@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"sync"
 
+	"github.com/curtisnewbie/miso/encoding/json"
 	"github.com/curtisnewbie/miso/miso"
 )
 
@@ -35,7 +36,7 @@ func Run() {
 	flag.Parse()
 
 	rail := miso.EmptyRail()
-	rail.SetLogLevel("debug")
+	miso.SetLogLevel("debug")
 
 	if *Host == "" {
 		panic("Host is required")
@@ -47,19 +48,19 @@ func Run() {
 		if err != nil {
 			panic(err)
 		}
-		rail.Infof("Configs: %v", r)
+		rail.Infof("Configs: %v", json.SIndent(r))
 	case CmdGetProxies:
 		r, err := GetProxies(rail, *Host)
 		if err != nil {
 			panic(err)
 		}
-		rail.Infof("Proxies: %v", r)
+		rail.Infof("Proxies: %v", json.SIndent(r))
 	case CmdGetProxiesNamed:
 		r, err := GetProxiesNamed(rail, *Host, *Proxy)
 		if err != nil {
 			panic(err)
 		}
-		rail.Infof("Proxies: %v", r)
+		rail.Infof("Proxies: %v", json.SIndent(r))
 	case CmdSelectProxy:
 		r, err := SelectProxy(rail, *Host, *ProxyGroup, *Proxy)
 		if err != nil {
@@ -85,7 +86,7 @@ func GetDelayAll(rail miso.Rail, host string, name string) {
 	rail.Infof("Proxies: %v", r)
 
 	var proxies ProxiesNamed
-	if err := miso.ParseJson([]byte(r), &proxies); err != nil {
+	if err := json.ParseJson([]byte(r), &proxies); err != nil {
 		panic(err)
 	}
 	rail.Infof("ProxiedNamed: %+v", proxies)
